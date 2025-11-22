@@ -22,8 +22,8 @@ import (
 // CloudStackAPI is a fake implementation of the CloudStack API for testing
 type CloudStackAPI struct {
 	// VirtualMachine responses
-	DeployVirtualMachineFunc func(*cloudstack.DeployVirtualMachineParams) (*cloudstack.DeployVirtualMachineResponse, error)
-	ListVirtualMachinesFunc func(*cloudstack.ListVirtualMachinesParams) (*cloudstack.ListVirtualMachinesResponse, error)
+	DeployVirtualMachineFunc  func(*cloudstack.DeployVirtualMachineParams) (*cloudstack.DeployVirtualMachineResponse, error)
+	ListVirtualMachinesFunc   func(*cloudstack.ListVirtualMachinesParams) (*cloudstack.ListVirtualMachinesResponse, error)
 	DestroyVirtualMachineFunc func(*cloudstack.DestroyVirtualMachineParams) (*cloudstack.DestroyVirtualMachineResponse, error)
 
 	// ServiceOffering responses
@@ -40,7 +40,7 @@ type CloudStackAPI struct {
 
 	// Tag responses
 	CreateTagsFunc func(*cloudstack.CreateTagsParams) (*cloudstack.CreateTagsResponse, error)
-	ListTagsFunc func(*cloudstack.ListTagsParams) (*cloudstack.ListTagsResponse, error)
+	ListTagsFunc   func(*cloudstack.ListTagsParams) (*cloudstack.ListTagsResponse, error)
 }
 
 var _ csapi.CloudStackAPI = (*CloudStackAPI)(nil)
@@ -139,4 +139,3 @@ func (f *CloudStackAPI) ListTags(p *cloudstack.ListTagsParams) (*cloudstack.List
 	}
 	return &cloudstack.ListTagsResponse{}, nil
 }
-

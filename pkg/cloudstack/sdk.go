@@ -233,4 +233,3 @@ func (c *Client) ListTags(p *cloudstack.ListTagsParams) (*cloudstack.ListTagsRes
 
 // Ensure Client implements CloudStackAPI
 var _ CloudStackAPI = (*Client)(nil)
-

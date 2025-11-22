@@ -35,15 +35,15 @@ type Provider interface {
 
 // Network represents a CloudStack network
 type Network struct {
-	ID          string
-	Name        string
-	Zone        string
-	ZoneID      string
-	Type        string
-	State       string
-	CIDR        string
-	Gateway     string
-	Tags        map[string]string
+	ID      string
+	Name    string
+	Zone    string
+	ZoneID  string
+	Type    string
+	State   string
+	CIDR    string
+	Gateway string
+	Tags    map[string]string
 }
 
 // DefaultProvider implements the Network Provider
@@ -218,4 +218,3 @@ func matchesTags(resourceTags, selectorTags map[string]string) bool {
 	}
 	return true
 }
-

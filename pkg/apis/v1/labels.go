@@ -38,15 +38,15 @@ const (
 	LabelDiskOfferingID      = "karpenter.k8s.cloudstack/disk-offering-id"
 
 	// Capacity type - CloudStack only supports on-demand
-	LabelCapacityType         = "karpenter.sh/capacity-type"
-	CapacityTypeOnDemand      = "on-demand"
+	LabelCapacityType    = "karpenter.sh/capacity-type"
+	CapacityTypeOnDemand = "on-demand"
 
 	// Tag keys used for resource identification
-	NodePoolTagKey     = "karpenter.sh/nodepool"
-	NodeClaimTagKey    = "karpenter.sh/nodeclaim"
-	NodeClassTagKey    = "karpenter.k8s.cloudstack/nodeclass"
-	ClusterNameTagKey  = "kubernetes.io/cluster"
-	ManagedByTagKey    = "karpenter.sh/managed-by"
+	NodePoolTagKey    = "karpenter.sh/nodepool"
+	NodeClaimTagKey   = "karpenter.sh/nodeclaim"
+	NodeClassTagKey   = "karpenter.k8s.cloudstack/nodeclass"
+	ClusterNameTagKey = "kubernetes.io/cluster"
+	ManagedByTagKey   = "karpenter.sh/managed-by"
 
 	// Annotations
 	AnnotationNodeClassHash        = "karpenter.k8s.cloudstack/nodeclass-hash"
@@ -59,4 +59,3 @@ const (
 	ArchitectureArm64 = "arm64"
 	OSLinux           = "linux"
 )
-

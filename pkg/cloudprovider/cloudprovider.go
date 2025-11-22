@@ -298,18 +298,18 @@ func (c *CloudProvider) instanceToNodeClaim(inst *instance.Instance, nodeClass *
 	nodeClaim := &karpv1.NodeClaim{}
 
 	labels := map[string]string{
-		corev1.LabelTopologyZone:         inst.Zone,
-		corev1.LabelInstanceTypeStable:   inst.ServiceOffering,
-		v1.LabelCapacityType:             v1.CapacityTypeOnDemand,
-		corev1.LabelArchStable:           v1.ArchitectureAmd64, // Default
-		corev1.LabelOSStable:             v1.OSLinux,
-		v1.LabelZoneID:                   inst.ZoneID,
-		v1.LabelZoneName:                 inst.Zone,
-		v1.LabelNetworkID:                inst.NetworkID,
-		v1.LabelServiceOfferingID:        inst.ServiceOfferingID,
-		v1.LabelServiceOfferingName:      inst.ServiceOffering,
-		v1.LabelTemplateID:               inst.TemplateID,
-		v1.LabelTemplateName:             inst.Template,
+		corev1.LabelTopologyZone:       inst.Zone,
+		corev1.LabelInstanceTypeStable: inst.ServiceOffering,
+		v1.LabelCapacityType:           v1.CapacityTypeOnDemand,
+		corev1.LabelArchStable:         v1.ArchitectureAmd64, // Default
+		corev1.LabelOSStable:           v1.OSLinux,
+		v1.LabelZoneID:                 inst.ZoneID,
+		v1.LabelZoneName:               inst.Zone,
+		v1.LabelNetworkID:              inst.NetworkID,
+		v1.LabelServiceOfferingID:      inst.ServiceOfferingID,
+		v1.LabelServiceOfferingName:    inst.ServiceOffering,
+		v1.LabelTemplateID:             inst.TemplateID,
+		v1.LabelTemplateName:           inst.Template,
 	}
 
 	// Add NodePool label if present
@@ -361,4 +361,3 @@ func ParseProviderID(providerID string) (string, error) {
 func FormatProviderID(zone, instanceID string) string {
 	return fmt.Sprintf("cloudstack://%s/%s", zone, instanceID)
 }
-

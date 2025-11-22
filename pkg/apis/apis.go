@@ -43,4 +43,3 @@ var CRDs = []runtime.Object{
 func GroupVersion() schema.GroupVersion {
 	return v1.SchemeGroupVersion
 }
-

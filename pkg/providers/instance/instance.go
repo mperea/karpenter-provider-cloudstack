@@ -42,28 +42,28 @@ type Provider interface {
 
 // Instance represents a CloudStack virtual machine
 type Instance struct {
-	ID          string
-	Name        string
-	State       string
-	Zone        string
-	ZoneID      string
-	ServiceOffering string
+	ID                string
+	Name              string
+	State             string
+	Zone              string
+	ZoneID            string
+	ServiceOffering   string
 	ServiceOfferingID string
-	Template    string
-	TemplateID  string
-	NetworkID   string
-	IPAddress   string
-	CreatedTime time.Time
-	Tags        map[string]string
+	Template          string
+	TemplateID        string
+	NetworkID         string
+	IPAddress         string
+	CreatedTime       time.Time
+	Tags              map[string]string
 }
 
 // DefaultProvider implements the Instance Provider
 type DefaultProvider struct {
-	csClient        csapi.CloudStackAPI
-	networkProvider network.Provider
+	csClient         csapi.CloudStackAPI
+	networkProvider  network.Provider
 	templateProvider template.Provider
-	cache           *cache.Cache
-	clusterName     string
+	cache            *cache.Cache
+	clusterName      string
 }
 
 // NewDefaultProvider creates a new instance provider
@@ -75,11 +75,11 @@ func NewDefaultProvider(
 	clusterName string,
 ) *DefaultProvider {
 	return &DefaultProvider{
-		csClient:        csClient,
-		networkProvider: networkProvider,
+		csClient:         csClient,
+		networkProvider:  networkProvider,
 		templateProvider: templateProvider,
-		cache:           cache,
-		clusterName:     clusterName,
+		cache:            cache,
+		clusterName:      clusterName,
 	}
 }
 
@@ -326,10 +326,10 @@ func (p *DefaultProvider) waitForVMState(ctx context.Context, vmID, targetState 
 // buildTags builds tags for the VM
 func (p *DefaultProvider) buildTags(nodeClass *v1.CloudStackNodeClass, nodeClaim *karpv1.NodeClaim) map[string]string {
 	tags := map[string]string{
-		v1.ManagedByTagKey: "karpenter",
+		v1.ManagedByTagKey:                         "karpenter",
 		v1.ClusterNameTagKey + "/" + p.clusterName: "owned",
-		v1.NodeClassTagKey: nodeClass.Name,
-		v1.NodeClaimTagKey: nodeClaim.Name,
+		v1.NodeClassTagKey:                         nodeClass.Name,
+		v1.NodeClaimTagKey:                         nodeClaim.Name,
 	}
 
 	// Add nodepool tag if present
@@ -437,4 +437,3 @@ func getFirstIPAddress(nics []cloudstack.Nic) string {
 	}
 	return ""
 }
-

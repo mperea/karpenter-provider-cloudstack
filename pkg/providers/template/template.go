@@ -246,4 +246,3 @@ func matchesTags(resourceTags, selectorTags map[string]string) bool {
 	}
 	return true
 }
-

@@ -175,9 +175,8 @@ func (c *Controller) Register(_ context.Context, m manager.Manager) error {
 		Named(controllerName).
 		For(&v1.CloudStackNodeClass{}).
 		WithOptions(controller.Options{
-			RateLimiter: reasonable.RateLimiter(),
+			RateLimiter:             reasonable.RateLimiter(),
 			MaxConcurrentReconciles: 10,
 		}).
 		Complete(c)
 }
-

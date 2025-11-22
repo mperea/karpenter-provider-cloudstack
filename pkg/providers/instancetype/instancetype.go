@@ -174,7 +174,7 @@ func (p *DefaultProvider) convertToInstanceType(offering *cloudstack.ServiceOffe
 	capacity := corev1.ResourceList{
 		corev1.ResourceCPU:    *resource.NewQuantity(int64(offering.Cpunumber), resource.DecimalSI),
 		corev1.ResourceMemory: *resource.NewQuantity(int64(offering.Memory)*1024*1024, resource.BinarySI), // MB to bytes
-		corev1.ResourcePods:   *resource.NewQuantity(110, resource.DecimalSI),                            // Default pod limit
+		corev1.ResourcePods:   *resource.NewQuantity(110, resource.DecimalSI),                             // Default pod limit
 	}
 
 	// Build requirements
@@ -198,7 +198,7 @@ func (p *DefaultProvider) convertToInstanceType(offering *cloudstack.ServiceOffe
 				scheduling.NewRequirement(corev1.LabelTopologyZone, corev1.NodeSelectorOpIn, zone),
 				scheduling.NewRequirement(v1.LabelCapacityType, corev1.NodeSelectorOpIn, v1.CapacityTypeOnDemand),
 			),
-			Price:    calculatePrice(offering), // Simple pricing calculation
+			Price:     calculatePrice(offering), // Simple pricing calculation
 			Available: true,
 		},
 	}
@@ -225,4 +225,3 @@ func calculatePrice(offering *cloudstack.ServiceOffering) float64 {
 	memCost := float64(offering.Memory) / 1024.0 * 0.005
 	return cpuCost + memCost
 }
-

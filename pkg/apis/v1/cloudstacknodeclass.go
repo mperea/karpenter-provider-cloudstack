@@ -274,4 +274,3 @@ func (in *CloudStackNodeClass) SetCondition(condition status.Condition) {
 	}
 	in.Status.Conditions = append(in.Status.Conditions, condition)
 }
-

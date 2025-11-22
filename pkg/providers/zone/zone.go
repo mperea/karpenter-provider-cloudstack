@@ -39,11 +39,11 @@ type Provider interface {
 
 // Zone represents a CloudStack zone
 type Zone struct {
-	ID                string
-	Name              string
-	NetworkType       string
-	AllocationState   string
-	LocalStorageEnabled bool
+	ID                    string
+	Name                  string
+	NetworkType           string
+	AllocationState       string
+	LocalStorageEnabled   bool
 	SecurityGroupsEnabled bool
 }
 
@@ -164,4 +164,3 @@ func (p *DefaultProvider) ValidateZone(ctx context.Context, zoneIdentifier strin
 
 	return nil
 }
-

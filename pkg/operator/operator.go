@@ -40,12 +40,12 @@ const (
 type Operator struct {
 	*operator.Operator
 
-	CloudStackClient    csapi.CloudStackAPI
-	ZoneProvider        zone.Provider
-	NetworkProvider     network.Provider
-	TemplateProvider    template.Provider
+	CloudStackClient     csapi.CloudStackAPI
+	ZoneProvider         zone.Provider
+	NetworkProvider      network.Provider
+	TemplateProvider     template.Provider
 	InstanceTypeProvider instancetype.Provider
-	InstanceProvider    instance.Provider
+	InstanceProvider     instance.Provider
 }
 
 // NewOperator creates a new CloudStack operator
@@ -94,13 +94,12 @@ func NewOperator(ctx context.Context, operator *operator.Operator) (context.Cont
 	log.FromContext(ctx).Info("CloudStack operator initialized successfully")
 
 	return ctx, &Operator{
-		Operator:            operator,
-		CloudStackClient:    csClient,
-		ZoneProvider:        zoneProvider,
-		NetworkProvider:     networkProvider,
-		TemplateProvider:    templateProvider,
+		Operator:             operator,
+		CloudStackClient:     csClient,
+		ZoneProvider:         zoneProvider,
+		NetworkProvider:      networkProvider,
+		TemplateProvider:     templateProvider,
 		InstanceTypeProvider: instanceTypeProvider,
-		InstanceProvider:    instanceProvider,
+		InstanceProvider:     instanceProvider,
 	}
 }
-
