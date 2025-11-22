@@ -1,0 +1,71 @@
+# Semantic Versioning 2.0.0 Configuration
+# https://semver.org/spec/v2.0.0.html
+
+version: "2.0.0"
+
+# Tag format: vMAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+# Examples:
+#   - v1.0.0
+#   - v0.1.0-alpha.1
+#   - v0.1.0-beta.2
+#   - v0.1.0-rc.1
+#   - v1.2.3+20130313144700
+
+# Version number format
+major: 0   # Breaking changes (incompatible API changes)
+minor: 1   # New features (backwards-compatible)
+patch: 0   # Bug fixes (backwards-compatible)
+
+# Pre-release identifiers (optional)
+# alpha: Early development, unstable
+# beta: Feature complete, testing phase
+# rc: Release candidate, production-ready testing
+prerelease:
+  types:
+    - alpha
+    - beta
+    - rc
+
+# Build metadata (optional)
+# Not used for version precedence
+# Examples: +20130313144700, +exp.sha.5114f85
+build_metadata: false
+
+# Version bumping rules
+bump_rules:
+  major:
+    - "BREAKING CHANGE"
+    - "breaking"
+  minor:
+    - "feat"
+    - "feature"
+  patch:
+    - "fix"
+    - "bugfix"
+    - "hotfix"
+    - "docs"
+    - "chore"
+    - "refactor"
+    - "perf"
+    - "test"
+
+# Git tag prefix
+tag_prefix: "v"
+
+# Examples of valid versions
+examples:
+  stable:
+    - v0.1.0
+    - v1.0.0
+    - v1.2.3
+  prerelease:
+    - v0.1.0-alpha.1
+    - v0.1.0-beta.1
+    - v0.1.0-rc.1
+    - v1.0.0-alpha.20130313
+  invalid:
+    - 1.0.0          # Missing 'v' prefix
+    - v1.0           # Missing patch version
+    - v1.0.0-Alpha.1 # Invalid prerelease format (uppercase)
+    - v1.0.0.0       # Too many version components
+
