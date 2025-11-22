@@ -202,6 +202,7 @@ type Template struct {
 
 // CloudStackNodeClass is the Schema for the CloudStackNodeClass API
 // +kubebuilder:object:root=true
+// +kubebuilder:object:generate=true
 // +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status",description=""
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp",description=""
 // +kubebuilder:printcolumn:name="Zone",type="string",JSONPath=".spec.zone",priority=1,description=""
