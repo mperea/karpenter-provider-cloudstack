@@ -24,6 +24,9 @@ jobs:
       - name: Run tests
         run: make test
 
+      - name: Install linting tools
+        run: make tools
+
       - name: Run linting
         run: make lint
 
