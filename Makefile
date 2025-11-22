@@ -5,7 +5,7 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 VERSION ?= $(shell git describe --tags --always --dirty)
 REGISTRY ?= ghcr.io/mperea
-IMAGE_NAME ?= karpenter-cloudstack
+IMAGE_NAME ?= cloudstack/karpenter
 IMAGE_TAG ?= $(VERSION)
 
 help: ## Display this help

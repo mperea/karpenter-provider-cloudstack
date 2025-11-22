@@ -17,6 +17,7 @@ package cloudprovider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/awslabs/operatorpkg/status"
@@ -347,10 +348,11 @@ func ParseProviderID(providerID string) (string, error) {
 	}
 
 	// Simple parsing - extract the last part after the last /
-	parts := lo.Reverse(lo.Split(providerID, "/"))
+	parts := strings.Split(providerID, "/")
 	if len(parts) == 0 {
 		return "", fmt.Errorf("invalid provider ID format: %s", providerID)
 	}
+	parts = lo.Reverse(parts)
 
 	return parts[0], nil
 }

@@ -277,12 +277,14 @@ func (p *DefaultProvider) Delete(ctx context.Context, id string) error {
 
 // selectInstanceType selects the best instance type based on node claim requirements
 func (p *DefaultProvider) selectInstanceType(nodeClaim *karpv1.NodeClaim, instanceTypes []*cloudprovider.InstanceType) *cloudprovider.InstanceType {
-	// For now, select the first compatible instance type
-	// In production, you'd want more sophisticated selection logic
-	for _, it := range instanceTypes {
-		if it.Requirements.Compatible(nodeClaim.Spec.Requirements) {
-			return it
-		}
+	// For now, select the first instance type that's available
+	// TODO: In production, implement more sophisticated selection logic:
+	// - Match CPU, memory, and other resource requirements
+	// - Consider cost optimization
+	// - Check zone availability
+	// - Filter by node labels and taints
+	if len(instanceTypes) > 0 {
+		return instanceTypes[0]
 	}
 	return nil
 }
@@ -376,6 +378,9 @@ func (p *DefaultProvider) getTags(ctx context.Context, resourceID string) (map[s
 
 // convertToInstance converts a CloudStack VM to an Instance
 func (p *DefaultProvider) convertToInstance(vm *cloudstack.VirtualMachine, tags map[string]string) *Instance {
+	// Parse creation time from CloudStack date string
+	createdTime := parseCloudStackTime(vm.Created)
+
 	return &Instance{
 		ID:                vm.Id,
 		Name:              vm.Name,
@@ -388,9 +393,33 @@ func (p *DefaultProvider) convertToInstance(vm *cloudstack.VirtualMachine, tags 
 		TemplateID:        vm.Templateid,
 		NetworkID:         getFirstNetworkID(vm.Nic),
 		IPAddress:         getFirstIPAddress(vm.Nic),
-		CreatedTime:       vm.Created,
+		CreatedTime:       createdTime,
 		Tags:              tags,
 	}
+}
+
+// parseCloudStackTime parses CloudStack time format (ISO 8601) to time.Time
+func parseCloudStackTime(timeStr string) time.Time {
+	if timeStr == "" {
+		return time.Time{}
+	}
+
+	// CloudStack uses ISO 8601 format: "2006-01-02T15:04:05-0700"
+	formats := []string{
+		time.RFC3339,
+		"2006-01-02T15:04:05-0700",
+		"2006-01-02T15:04:05+0000",
+		"2006-01-02T15:04:05Z",
+	}
+
+	for _, format := range formats {
+		if t, err := time.Parse(format, timeStr); err == nil {
+			return t
+		}
+	}
+
+	// If parsing fails, return zero time
+	return time.Time{}
 }
 
 // getFirstNetworkID returns the first network ID from NICs

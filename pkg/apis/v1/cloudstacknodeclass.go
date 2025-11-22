@@ -17,10 +17,9 @@ package v1
 import (
 	"fmt"
 
+	"github.com/awslabs/operatorpkg/status"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/samber/lo"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -158,7 +157,7 @@ type CloudStackNodeClassStatus struct {
 
 	// Conditions contains signals for health and readiness
 	// +optional
-	Conditions []metav1.Condition `json:"conditions,omitempty"`
+	Conditions []status.Condition `json:"conditions,omitempty"`
 }
 
 // Network describes a CloudStack network
@@ -237,13 +236,26 @@ func (in *CloudStackNodeClass) Hash() string {
 	})))
 }
 
-// StatusConditions returns the status conditions
-func (in *CloudStackNodeClass) StatusConditions() []metav1.Condition {
+// StatusConditions returns a ConditionSet for evaluating the status of CloudStackNodeClass
+func (in *CloudStackNodeClass) StatusConditions() status.ConditionSet {
+	conditionTypes := []string{
+		"Ready",
+	}
+	return status.NewReadyConditions(conditionTypes...).For(in)
+}
+
+// GetConditions returns the status conditions (required by status.Object interface)
+func (in *CloudStackNodeClass) GetConditions() []status.Condition {
 	return in.Status.Conditions
 }
 
+// SetConditions sets the status conditions (required by status.Object interface)
+func (in *CloudStackNodeClass) SetConditions(conditions []status.Condition) {
+	in.Status.Conditions = conditions
+}
+
 // GetCondition returns the condition with the given type
-func (in *CloudStackNodeClass) GetCondition(conditionType string) *metav1.Condition {
+func (in *CloudStackNodeClass) GetCondition(conditionType string) *status.Condition {
 	for i := range in.Status.Conditions {
 		if in.Status.Conditions[i].Type == conditionType {
 			return &in.Status.Conditions[i]
@@ -253,7 +265,7 @@ func (in *CloudStackNodeClass) GetCondition(conditionType string) *metav1.Condit
 }
 
 // SetCondition sets or updates a condition
-func (in *CloudStackNodeClass) SetCondition(condition metav1.Condition) {
+func (in *CloudStackNodeClass) SetCondition(condition status.Condition) {
 	for i := range in.Status.Conditions {
 		if in.Status.Conditions[i].Type == condition.Type {
 			in.Status.Conditions[i] = condition

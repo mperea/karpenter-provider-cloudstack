@@ -19,8 +19,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/awslabs/operatorpkg/reasonable"
+	"github.com/awslabs/operatorpkg/status"
 	"github.com/samber/lo"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	controllerruntime "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -81,8 +84,8 @@ func (c *Controller) Reconcile(ctx context.Context, req reconcile.Request) (reco
 	}
 
 	// Validate zone
-	if err := c.zoneProvider.ValidateZone(ctx, nodeClass.Spec.Zone); err != nil {
-		c.setCondition(nodeClass, metav1.Condition{
+	if _, err := c.zoneProvider.GetByName(ctx, nodeClass.Spec.Zone); err != nil {
+		c.setCondition(nodeClass, status.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
 			Reason:  "ZoneValidationFailed",
@@ -95,7 +98,7 @@ func (c *Controller) Reconcile(ctx context.Context, req reconcile.Request) (reco
 	// Resolve networks
 	networks, err := c.networkProvider.ResolveNetworks(ctx, nodeClass.Spec.NetworkSelectorTerms, nodeClass.Spec.Zone)
 	if err != nil {
-		c.setCondition(nodeClass, metav1.Condition{
+		c.setCondition(nodeClass, status.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
 			Reason:  "NetworkResolutionFailed",
@@ -108,7 +111,7 @@ func (c *Controller) Reconcile(ctx context.Context, req reconcile.Request) (reco
 	// Resolve templates
 	templates, err := c.templateProvider.ResolveTemplates(ctx, nodeClass.Spec.TemplateSelectorTerms, nodeClass.Spec.Zone)
 	if err != nil {
-		c.setCondition(nodeClass, metav1.Condition{
+		c.setCondition(nodeClass, status.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
 			Reason:  "TemplateResolutionFailed",
@@ -138,7 +141,7 @@ func (c *Controller) Reconcile(ctx context.Context, req reconcile.Request) (reco
 	})
 
 	// Set Ready condition
-	c.setCondition(nodeClass, metav1.Condition{
+	c.setCondition(nodeClass, status.Condition{
 		Type:    "Ready",
 		Status:  metav1.ConditionTrue,
 		Reason:  "Ready",
@@ -159,21 +162,22 @@ func (c *Controller) Reconcile(ctx context.Context, req reconcile.Request) (reco
 }
 
 // setCondition sets a condition on the NodeClass
-func (c *Controller) setCondition(nodeClass *v1.CloudStackNodeClass, condition metav1.Condition) {
+func (c *Controller) setCondition(nodeClass *v1.CloudStackNodeClass, condition status.Condition) {
 	condition.LastTransitionTime = metav1.Now()
 	condition.ObservedGeneration = nodeClass.Generation
 
 	nodeClass.SetCondition(condition)
 }
 
-// Name returns the controller name
-func (c *Controller) Name() string {
-	return controllerName
-}
-
-// Builder returns the controller builder
-func (c *Controller) Builder(ctx context.Context, m manager.Manager) controller.Builder {
-	return controller.NewSingletonManagedBy(m).
-		For(&v1.CloudStackNodeClass{})
+// Register registers the controller with the manager
+func (c *Controller) Register(_ context.Context, m manager.Manager) error {
+	return controllerruntime.NewControllerManagedBy(m).
+		Named(controllerName).
+		For(&v1.CloudStackNodeClass{}).
+		WithOptions(controller.Options{
+			RateLimiter: reasonable.RateLimiter(),
+			MaxConcurrentReconciles: 10,
+		}).
+		Complete(c)
 }
 

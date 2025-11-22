@@ -95,9 +95,14 @@ func NewClient(ctx context.Context, cfg Config) (*Client, error) {
 		Timeout: cfg.Timeout,
 	}
 
-	// Create CloudStack client
-	cs := cloudstack.NewAsyncClient(cfg.APIURL, cfg.APIKey, cfg.SecretKey, !cfg.VerifySSL)
-	cs.HTTPClient = httpClient
+	// Create CloudStack client with custom HTTP client
+	cs := cloudstack.NewAsyncClient(
+		cfg.APIURL,
+		cfg.APIKey,
+		cfg.SecretKey,
+		!cfg.VerifySSL,
+		cloudstack.WithHTTPClient(httpClient),
+	)
 
 	log.FromContext(ctx).Info("CloudStack client initialized",
 		"apiURL", cfg.APIURL,
