@@ -1,0 +1,60 @@
+apiVersion: karpenter.k8s.cloudstack/v1
+kind: CloudStackNodeClass
+metadata:
+  name: default
+spec:
+  # Zone where nodes will be created
+  zone: zone-01
+
+  # Network selection - you can use tags, id, or name
+  networkSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+        environment: production
+    # Alternative: select by ID
+    # - id: network-uuid
+    # Alternative: select by name
+    # - name: default-network
+
+  # Service offering selection
+  serviceOfferingSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+    # Alternative: select specific offerings
+    # - name: Medium Instance
+    # - name: Large Instance
+
+  # Template selection
+  templateSelectorTerms:
+    - tags:
+        os: ubuntu
+        version: "22.04"
+        type: karpenter
+    # Alternative: select by OS type
+    # - osType: Ubuntu 22.04
+    # Alternative: select by ID
+    # - id: template-uuid
+
+  # User data for node initialization
+  userData: |
+    #!/bin/bash
+    set -e
+
+    # Wait for cloud-init to complete
+    cloud-init status --wait
+
+    # Your custom initialization here
+    echo "Node initialization complete"
+
+  # Tags to apply to VMs
+  tags:
+    team: platform
+    managed-by: karpenter
+    environment: production
+
+  # Optional: Root disk size in GB
+  rootDiskSize: 50
+
+  # Optional: SSH keypair name
+  sshKeyPair: my-keypair
+

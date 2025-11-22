@@ -1,0 +1,126 @@
+# Advanced example with multiple NodePools for different workload types
+
+---
+# NodeClass for general workloads
+apiVersion: karpenter.k8s.cloudstack/v1
+kind: CloudStackNodeClass
+metadata:
+  name: general
+spec:
+  zone: zone-01
+  networkSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+  serviceOfferingSelectorTerms:
+    - name: "Medium Instance"
+    - name: "Large Instance"
+  templateSelectorTerms:
+    - tags:
+        os: ubuntu
+        version: "22.04"
+  userData: |
+    #!/bin/bash
+    echo "General workload node"
+
+---
+# NodeClass for compute-intensive workloads
+apiVersion: karpenter.k8s.cloudstack/v1
+kind: CloudStackNodeClass
+metadata:
+  name: compute-intensive
+spec:
+  zone: zone-01
+  networkSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: my-cluster
+  serviceOfferingSelectorTerms:
+    - name: "Compute Optimized Large"
+    - name: "Compute Optimized XL"
+  templateSelectorTerms:
+    - tags:
+        os: ubuntu
+        version: "22.04"
+  rootDiskSize: 100
+  userData: |
+    #!/bin/bash
+    echo "Compute-intensive node"
+
+---
+# NodePool for general workloads
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: general
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.cloudstack
+        kind: CloudStackNodeClass
+        name: general
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values: ["Medium Instance", "Large Instance"]
+        - key: workload-type
+          operator: In
+          values: ["general"]
+  limits:
+    cpu: "500"
+    memory: 500Gi
+
+---
+# NodePool for compute-intensive workloads
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: compute-intensive
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.cloudstack
+        kind: CloudStackNodeClass
+        name: compute-intensive
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values: ["Compute Optimized Large", "Compute Optimized XL"]
+        - key: workload-type
+          operator: In
+          values: ["compute"]
+      taints:
+        - key: workload-type
+          value: compute
+          effect: NoSchedule
+  limits:
+    cpu: "500"
+    memory: 500Gi
+
+---
+# Example workload that uses compute-intensive nodes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compute-job
+spec:
+  nodeSelector:
+    workload-type: compute
+  tolerations:
+    - key: workload-type
+      value: compute
+      effect: NoSchedule
+  containers:
+    - name: compute
+      image: my-compute-image:latest
+      resources:
+        requests:
+          cpu: "8"
+          memory: 16Gi
+

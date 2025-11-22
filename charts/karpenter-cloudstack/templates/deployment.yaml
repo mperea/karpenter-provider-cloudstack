@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "karpenter-cloudstack.fullname" . }}
+  labels:
+    {{- include "karpenter-cloudstack.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "karpenter-cloudstack.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "karpenter-cloudstack.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "karpenter-cloudstack.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: controller
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: CLOUDSTACK_API_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "karpenter-cloudstack.fullname" . }}-cloudstack
+              key: apiUrl
+        - name: CLOUDSTACK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "karpenter-cloudstack.fullname" . }}-cloudstack
+              key: apiKey
+        - name: CLOUDSTACK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "karpenter-cloudstack.fullname" . }}-cloudstack
+              key: secretKey
+        - name: CLOUDSTACK_VERIFY_SSL
+          value: "{{ .Values.cloudstack.verifySSL }}"
+        - name: CLUSTER_NAME
+          value: {{ .Values.clusterName | quote }}
+        - name: LOG_LEVEL
+          value: {{ .Values.logLevel | quote }}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: webhook
+          containerPort: 8443
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

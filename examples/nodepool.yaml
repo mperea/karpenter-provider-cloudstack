@@ -1,0 +1,58 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  # Template for nodes
+  template:
+    spec:
+      # Reference to CloudStackNodeClass
+      nodeClassRef:
+        group: karpenter.k8s.cloudstack
+        kind: CloudStackNodeClass
+        name: default
+
+      # Requirements for node selection
+      requirements:
+        # Capacity type - CloudStack only supports on-demand
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+
+        # Instance types (service offerings)
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+            - "Medium Instance"
+            - "Large Instance"
+            - "Extra Large Instance"
+
+        # Architecture
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+
+        # OS
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+
+      # Taints for workload isolation
+      taints:
+        - key: workload-type
+          value: batch
+          effect: NoSchedule
+
+  # Limits for the NodePool
+  limits:
+    cpu: "1000"
+    memory: 1000Gi
+
+  # Disruption budget
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 30s
+
+  # Node expiry settings
+  expireAfter: 720h # 30 days
+
