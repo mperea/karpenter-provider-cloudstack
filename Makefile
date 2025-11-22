@@ -5,8 +5,16 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 VERSION ?= $(shell git describe --tags --always --dirty)
 REGISTRY ?= ghcr.io/mperea
-IMAGE_NAME ?= cloudstack/karpenter
+PROJECT_PATH ?= cloudstack/karpenter
+
+# Container Image
+IMAGE_NAME ?= $(PROJECT_PATH)/controller
 IMAGE_TAG ?= $(VERSION)
+IMAGE = $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG)
+
+# Helm Chart
+CHART_NAME ?= $(PROJECT_PATH)/karpenter
+CHART_VERSION ?= $(VERSION)
 
 help: ## Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -49,11 +57,11 @@ clean: ## Clean build artifacts
 ##@ Docker
 
 docker-build: ## Build docker image
-	docker build -t $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG) .
-	docker tag $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG) $(REGISTRY)/$(IMAGE_NAME):latest
+	docker build -t $(IMAGE) .
+	docker tag $(IMAGE) $(REGISTRY)/$(IMAGE_NAME):latest
 
 docker-push: ## Push docker image
-	docker push $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker push $(IMAGE)
 	docker push $(REGISTRY)/$(IMAGE_NAME):latest
 
 ##@ Deployment
@@ -65,7 +73,6 @@ generate: ## Generate CRDs and other manifests
 deploy: ## Deploy to Kubernetes cluster
 	helm upgrade --install karpenter-cloudstack ./charts/karpenter-cloudstack \
 		--namespace karpenter --create-namespace \
-		--set image.repository=$(REGISTRY)/$(IMAGE_NAME) \
 		--set image.tag=$(IMAGE_TAG)
 
 undeploy: ## Remove from Kubernetes cluster
