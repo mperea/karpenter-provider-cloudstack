@@ -1,7 +1,12 @@
 ##
 # Build stage
 ##
-FROM golang:1.25.4-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25.4-alpine AS builder
+
+# Build arguments for cross-compilation
+ARG TARGETOS
+ARG TARGETARCH
+ARG VERSION=dev
 
 WORKDIR /workspace
 
@@ -13,13 +18,15 @@ RUN go mod download
 COPY cmd/ cmd/
 COPY pkg/ pkg/
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o controller cmd/controller/main.go
+# Build for target architecture
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -a -ldflags="-X main.version=${VERSION}" \
+    -o controller cmd/controller/main.go
 
 ##
 # Final stage
 ##
-FROM gcr.io/distroless/static:nonroot
+FROM --platform=$TARGETPLATFORM gcr.io/distroless/static:nonroot
 
 WORKDIR /
 

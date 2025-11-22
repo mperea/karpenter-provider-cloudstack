@@ -56,13 +56,33 @@ clean: ## Clean build artifacts
 
 ##@ Docker
 
-docker-build: ## Build docker image
-	docker build -t $(IMAGE) .
+docker-build: ## Build docker image for current platform
+	docker build -t $(IMAGE) \
+		--build-arg VERSION=$(VERSION) \
+		.
 	docker tag $(IMAGE) $(REGISTRY)/$(IMAGE_NAME):latest
+
+docker-build-multiarch: ## Build docker image for multiple architectures (amd64, arm64)
+	docker buildx build \
+		--platform linux/amd64,linux/arm64 \
+		--build-arg VERSION=$(VERSION) \
+		-t $(IMAGE) \
+		-t $(REGISTRY)/$(IMAGE_NAME):latest \
+		--load \
+		.
 
 docker-push: ## Push docker image
 	docker push $(IMAGE)
 	docker push $(REGISTRY)/$(IMAGE_NAME):latest
+
+docker-push-multiarch: ## Build and push multi-arch docker images
+	docker buildx build \
+		--platform linux/amd64,linux/arm64 \
+		--build-arg VERSION=$(VERSION) \
+		-t $(IMAGE) \
+		-t $(REGISTRY)/$(IMAGE_NAME):latest \
+		--push \
+		.
 
 ##@ Deployment
 
