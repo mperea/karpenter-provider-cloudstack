@@ -23,7 +23,7 @@ vet: ## Run go vet
 	go vet ./...
 
 lint: ## Run golangci-lint
-	golangci-lint run
+	$(shell go env GOPATH)/bin/golangci-lint run
 
 test: ## Run unit tests
 	go test -v ./...
@@ -75,7 +75,8 @@ undeploy: ## Remove from Kubernetes cluster
 
 tools: ## Install development tools
 	go install sigs.k8s.io/controller-tools/cmd/controller-gen@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@echo "Installing golangci-lint official binary..."
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin
 
 verify: tidy fmt vet lint test ## Run all verification checks
 

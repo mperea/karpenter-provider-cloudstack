@@ -352,9 +352,8 @@ func ParseProviderID(providerID string) (string, error) {
 	if len(parts) == 0 {
 		return "", fmt.Errorf("invalid provider ID format: %s", providerID)
 	}
-	parts = lo.Reverse(parts)
 
-	return parts[0], nil
+	return parts[len(parts)-1], nil
 }
 
 // FormatProviderID formats a provider ID

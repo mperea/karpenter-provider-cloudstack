@@ -26,10 +26,6 @@ import (
 	csapi "github.com/mperea/karpenter-provider-cloudstack/pkg/cloudstack"
 )
 
-const (
-	cacheTTL = 15 * 60 // 15 minutes
-)
-
 // Provider provides zone information
 type Provider interface {
 	List(ctx context.Context) ([]*Zone, error)
