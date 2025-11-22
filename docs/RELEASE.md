@@ -1,288 +1,266 @@
 # Release Process
 
-Este documento describe el proceso de publicación de nuevas versiones del Karpenter Provider para CloudStack.
+This document describes the process for publishing new versions of the Karpenter Provider for CloudStack.
 
-## 📦 Artefactos Publicados
+## Published Artifacts
 
-Cada release genera los siguientes artefactos:
+Each release generates the following artifacts:
 
-### 1. **Container Image**
+### 1. Container Image
 ```
 ghcr.io/mperea/cloudstack/karpenter/controller:v{VERSION}
 ```
-- Publicado en GitHub Container Registry (GHCR)
-- Arquitecturas: `amd64` (arm64 en el futuro)
-- Tags generados:
-  - `v{VERSION}` - Versión específica (ej: `v0.1.0`)
-  - `latest` - Última versión estable (solo para releases, no pre-releases)
-  - `main` - Última versión de la rama main (desarrollo continuo)
+- Published to GitHub Container Registry (GHCR)
+- Architectures: `amd64`, `arm64`
+- Generated tags:
+  - `v{VERSION}` - Specific version (e.g., `v0.1.0`)
+  - `latest` - Latest stable version (only for stable releases, not pre-releases)
+  - `main` - Latest version from main branch (continuous development)
 
-### 2. **Helm Chart**
+### 2. Helm Chart
 ```
 ghcr.io/mperea/cloudstack/karpenter/karpenter:v{VERSION}
 ```
-- Publicado en GHCR como OCI artifact
-- También disponible en GitHub Pages: `https://mperea.github.io/karpenter-provider-cloudstack`
+- Published to GHCR as OCI artifact
+- Also available on GitHub Pages: `https://mperea.github.io/karpenter-provider-cloudstack`
 
-### 3. **CRDs (Custom Resource Definitions)**
-- Incluidos en el Helm Chart
-- También disponibles como archivos YAML en GitHub Releases
+### 3. CRDs (Custom Resource Definitions)
+- Included in the Helm Chart
+- Also available as YAML files in GitHub Releases
 
-### 4. **GitHub Release**
-- Release notes generados automáticamente
-- Assets adjuntos:
+### 4. GitHub Release
+- Automatically generated release notes
+- Attached assets:
   - Helm Chart (`.tgz`)
   - CRDs (`.yaml`)
-  - Documentación de instalación
+  - Installation documentation
 
 ---
 
-## 🔄 Tipos de Releases
+## Release Types
 
-### **Desarrollo (main branch)**
+### Development (main branch)
 ```bash
 git push origin main
 ```
-**Artefactos generados:**
-- ✅ Container Image: `:main`
-- ❌ Helm Chart: No publicado
-- ❌ GitHub Release: No
+**Generated artifacts:**
+- Container Image: `:main`
+- Helm Chart: Not published
+- GitHub Release: No
 
-**Uso:** Testing continuo, desarrollo activo
+**Usage:** Continuous testing, active development
 
 ---
 
-### **Pre-Release (alpha/beta/rc)**
+### Pre-Release (alpha/beta/rc)
 ```bash
 git tag v0.1.0-alpha.1
 git push origin v0.1.0-alpha.1
 ```
 
-**Artefactos generados:**
-- ✅ Container Image: `:v0.1.0-alpha.1`
-- ✅ Helm Chart: `0.1.0-alpha.1`
-- ✅ GitHub Pre-Release (marcado como pre-release)
-- ✅ CRDs en assets
+**Generated artifacts:**
+- Container Image: `:v0.1.0-alpha.1`
+- Helm Chart: `0.1.0-alpha.1`
+- GitHub Pre-Release (marked as pre-release)
+- CRDs in assets
 
-**Uso:** Testing en staging, validación antes de release estable
+**Usage:** Staging testing, validation before stable release
 
-**Instalación:**
+**Installation:**
 ```bash
-# Helm Chart desde OCI
+# Helm Chart from OCI
 helm install karpenter oci://ghcr.io/mperea/cloudstack/karpenter/karpenter \
   --version 0.1.0-alpha.1
 
-# Helm Chart desde GitHub Pages
+# Helm Chart from GitHub Pages
 helm repo add cloudstack-karpenter https://mperea.github.io/karpenter-provider-cloudstack
 helm install karpenter cloudstack-karpenter/karpenter --version 0.1.0-alpha.1
 ```
 
 ---
 
-### **Release Estable (vX.Y.Z)**
+### Stable Release (vX.Y.Z)
 ```bash
 git tag v0.1.0
 git push origin v0.1.0
 ```
 
-**Artefactos generados:**
-- ✅ Container Image: `:v0.1.0` + `:latest`
-- ✅ Helm Chart: `0.1.0`
-- ✅ GitHub Release (estable, release notes completos)
-- ✅ CRDs en assets
-- ✅ Actualización de documentación
+**Generated artifacts:**
+- Container Image: `:v0.1.0` + `:latest`
+- Helm Chart: `0.1.0`
+- GitHub Release (stable, complete release notes)
+- CRDs in release assets
+- Documentation update
 
-**Uso:** Producción
+**Usage:** Production
 
-**Instalación:**
+**Installation:**
 ```bash
-# Helm Chart desde OCI
+# Helm Chart from OCI
 helm install karpenter oci://ghcr.io/mperea/cloudstack/karpenter/karpenter \
   --version 0.1.0
 
-# Helm Chart desde GitHub Pages (recomendado)
+# Helm Chart from GitHub Pages (recommended)
 helm repo add cloudstack-karpenter https://mperea.github.io/karpenter-provider-cloudstack
 helm install karpenter cloudstack-karpenter/karpenter --version 0.1.0
 ```
 
 ---
 
-## 📋 Versionado Semántico
+## Semantic Versioning
 
-Seguimos **[Semantic Versioning 2.0.0](https://semver.org/)**:
+We follow **[Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)**:
 
 ```
-v{MAJOR}.{MINOR}.{PATCH}[-{PRERELEASE}]
+v{MAJOR}.{MINOR}.{PATCH}[-{PRERELEASE}][+{BUILD}]
+
+Examples:
+- v1.0.0         → First stable version
+- v0.1.1         → Bugfix
+- v0.2.0         → New feature
+- v1.0.0         → Production-ready version
+- v0.1.0-alpha.1 → Alpha pre-release
+- v0.1.0-beta.1  → Beta pre-release
+- v0.1.0-rc.1    → Release candidate
 ```
 
-### **MAJOR (v1.0.0)**
-Breaking changes - Cambios incompatibles con versiones anteriores:
-- Cambios en la API del CRD CloudStackNodeClass
-- Eliminación de campos o funcionalidades
-- Cambios en el comportamiento por defecto que rompen compatibilidad
-
-### **MINOR (v0.1.0)**
-Nuevas funcionalidades compatibles:
-- Nuevos campos en CloudStackNodeClass
-- Nuevas características opcionales
-- Mejoras de rendimiento sin breaking changes
-
-### **PATCH (v0.1.1)**
-Bugfixes y mejoras menores:
-- Corrección de errores
-- Actualizaciones de seguridad
-- Mejoras de documentación
-- Actualizaciones de dependencias (sin breaking changes)
-
-### **PRE-RELEASE**
-Versiones no estables:
-- `-alpha.N` - Versión alpha, puede tener bugs, API puede cambiar
-- `-beta.N` - Versión beta, API más estable, testing en staging
-- `-rc.N` - Release candidate, candidato a release estable
-
-**Ejemplos:**
-```
-v0.1.0         → Primera versión estable (alpha del proyecto)
-v0.1.1         → Bugfix
-v0.2.0         → Nueva funcionalidad
-v1.0.0         → Primera versión production-ready
-v0.1.0-alpha.1 → Pre-release alpha
-v0.1.0-beta.1  → Pre-release beta
-v0.1.0-rc.1    → Release candidate
-```
+**Rules:**
+- **MAJOR (1.x.x)**: Incompatible changes (breaking changes)
+- **MINOR (x.1.x)**: New backwards-compatible functionality
+- **PATCH (x.x.1)**: Backwards-compatible bug fixes
+- **Pre-release**: `-alpha`, `-beta`, `-rc` for unstable versions
 
 ---
 
-## 🚀 Proceso de Release Manual
+## Manual Release Process
 
-### **1. Preparación**
+### 1. Preparation
 
 ```bash
-# Actualizar rama main
+# Update main branch
 git checkout main
 git pull origin main
 
-# Crear rama de release (opcional, para cambios de última hora)
+# Create release branch (optional, for last-minute changes)
 git checkout -b release/v0.1.0
 
-# Actualizar CHANGELOG (si existe)
-# Actualizar versiones en Chart.yaml si es necesario
+# Update CHANGELOG (if exists)
+# Update versions in Chart.yaml if needed
 ```
 
-### **2. Verificación Pre-Release**
+### 2. Pre-Release Verification
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 make test
 
-# Verificar linting
+# Verify linting
 make lint
 
-# Build local
+# Local build
 make build
 
-# Verificar que todo compila
+# Verify everything compiles
 make docker-build
 ```
 
-### **3. Crear Tag**
+### 3. Create Tag
 
 ```bash
-# Para release estable
+# For stable release
 git tag -a v0.1.0 -m "Release v0.1.0"
 
-# Para pre-release
+# For pre-release
 git tag -a v0.1.0-alpha.1 -m "Pre-release v0.1.0-alpha.1"
 
-# Verificar el tag
+# Verify tag
 git tag -l -n9 v0.1.0
 ```
 
-### **4. Push del Tag**
+### 4. Push Tag
 
 ```bash
-# Push el tag (esto dispara el workflow de release)
+# Push tag (triggers release workflow)
 git push origin v0.1.0
 ```
 
-### **5. Monitorear el Pipeline**
+### 5. Monitor Pipeline
 
 ```bash
-# El workflow de GitHub Actions se ejecuta automáticamente
-# Verificar en: https://github.com/mperea/karpenter-provider-cloudstack/actions
+# GitHub Actions workflow runs automatically
+# Check: https://github.com/mperea/karpenter-provider-cloudstack/actions
 ```
 
-### **6. Verificar Artefactos**
+### 6. Verify Artifacts
 
 ```bash
-# Verificar imagen Docker
+# Verify Docker image
 docker pull ghcr.io/mperea/cloudstack/karpenter/controller:v0.1.0
 
-# Verificar Helm Chart (OCI)
+# Verify Helm Chart (OCI)
 helm pull oci://ghcr.io/mperea/cloudstack/karpenter/karpenter --version 0.1.0
 
-# Verificar GitHub Release
+# Verify GitHub Release
 # https://github.com/mperea/karpenter-provider-cloudstack/releases
 ```
 
-### **7. Actualizar Documentación**
+### 7. Update Documentation
 
 ```bash
-# Actualizar README con la nueva versión
-# Actualizar INSTALLATION.md si hay cambios
-# Anunciar en canales relevantes (Slack, Twitter, etc.)
+# Update README with new version
+# Update INSTALLATION.md if there are changes
+# Announce in relevant channels (Slack, Twitter, etc.)
 ```
 
 ---
 
-## 🛠️ Rollback de Release
+## Release Rollback
 
-Si necesitas revertir un release:
+If you need to revert a release:
 
 ```bash
-# Eliminar el tag localmente
+# Delete tag locally
 git tag -d v0.1.0
 
-# Eliminar el tag del remoto
+# Delete tag from remote
 git push origin :refs/tags/v0.1.0
 
-# Eliminar la GitHub Release (desde la UI o con gh CLI)
+# Delete GitHub Release (from UI or with gh CLI)
 gh release delete v0.1.0
 
-# Eliminar las imágenes de GHCR (desde la UI)
+# Delete GHCR images (from UI)
 # https://github.com/users/mperea/packages/container/cloudstack%2Fkarpenter%2Fcontroller
 ```
 
 ---
 
-## 📝 Checklist de Release
+## Release Checklist
 
-### **Pre-Release**
-- [ ] Todos los tests pasan (`make test`)
-- [ ] Linting limpio (`make lint`)
-- [ ] Documentación actualizada
-- [ ] CHANGELOG actualizado (si aplica)
-- [ ] Versión actualizada en Chart.yaml (si es manual)
-- [ ] Branch main actualizado
+### Pre-Release
+- [ ] All tests pass (`make test`)
+- [ ] Clean linting (`make lint`)
+- [ ] Documentation updated
+- [ ] CHANGELOG updated (if applicable)
+- [ ] Version updated in Chart.yaml (if manual)
+- [ ] Main branch updated
 
-### **Release**
-- [ ] Tag creado con nombre correcto (vX.Y.Z o vX.Y.Z-alpha.N)
-- [ ] Tag pusheado a GitHub
-- [ ] Pipeline de CI/CD completado exitosamente
-- [ ] Artefactos verificados (imagen, chart, GitHub release)
+### Release
+- [ ] Tag created with correct name (vX.Y.Z or vX.Y.Z-alpha.N)
+- [ ] Tag pushed to GitHub
+- [ ] CI/CD pipeline completed successfully
+- [ ] Artifacts verified (image, chart, GitHub release)
 
-### **Post-Release**
-- [ ] Instalación probada desde Helm
-- [ ] Documentación verificada
-- [ ] Release anunciado (si es relevante)
-- [ ] Issues/PRs actualizados con la nueva versión
+### Post-Release
+- [ ] Installation tested from Helm
+- [ ] Documentation verified
+- [ ] Release announced (if relevant)
+- [ ] Issues/PRs updated with new version
 
 ---
 
-## 🔗 Referencias
+## References
 
 - [Semantic Versioning 2.0.0](https://semver.org/)
 - [Karpenter Documentation](https://karpenter.sh)
 - [Helm Best Practices](https://helm.sh/docs/chart_best_practices/)
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
-

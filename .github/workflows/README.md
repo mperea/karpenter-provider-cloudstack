@@ -1,93 +1,93 @@
 # GitHub Actions Workflows
 
-Este directorio contiene los workflows de CI/CD del proyecto.
+This directory contains the CI/CD workflows for the project.
 
-## Workflows Disponibles
+## Available Workflows
 
-### 1. **CI (ci.yaml)**
+### 1. CI (ci.yaml)
 
-Workflow de integración continua que se ejecuta en cada push y pull request.
+Continuous integration workflow that runs on every push and pull request.
 
 **Triggers:**
-- Push a `main`
-- Pull requests a `main`
+- Push to `main`
+- Pull requests to `main`
 
 **Jobs:**
-- **test**: Tests unitarios y linting
-- **build**: Compilación del binario
-- **docker**: Build de imagen Docker (solo en push)
+- **test**: Unit tests and linting
+- **build**: Binary compilation
+- **docker**: Docker image build (push only)
 
-### 2. **Release (release.yaml)**
+### 2. Release (release.yaml)
 
-Workflow de publicación automática que se ejecuta al crear tags.
+Automatic publication workflow that runs when creating tags.
 
 **Triggers:**
-- Push de tags: `v*` (ej: `v0.1.0`, `v0.1.0-alpha.1`)
+- Push tags: `v*` (e.g., `v0.1.0`, `v0.1.0-alpha.1`)
 
 **Jobs:**
 - **release**:
-  - Build multi-arch container image (amd64, arm64)
-  - Push a GitHub Container Registry
+  - Multi-arch container image build (amd64, arm64)
+  - Push to GitHub Container Registry
   - Package Helm chart
-  - Push Helm chart a OCI registry
-  - Crear GitHub Release con assets
-  
+  - Push Helm chart to OCI registry
+  - Create GitHub Release with assets
+
 - **update-helm-repo**:
-  - Actualizar repositorio Helm en GitHub Pages
+  - Update Helm repository on GitHub Pages
 
-**Artefactos generados:**
-- 🐳 Container Image: `ghcr.io/mperea/cloudstack/karpenter/controller:v{VERSION}`
-- 📦 Helm Chart (OCI): `oci://ghcr.io/mperea/cloudstack/karpenter/karpenter`
-- 📦 Helm Chart (GitHub Pages): `https://mperea.github.io/karpenter-provider-cloudstack`
-- 📝 GitHub Release con CRDs
+**Generated artifacts:**
+- Container Image: `ghcr.io/mperea/cloudstack/karpenter/controller:v{VERSION}`
+- Helm Chart (OCI): `oci://ghcr.io/mperea/cloudstack/karpenter/karpenter`
+- Helm Chart (GitHub Pages): `https://mperea.github.io/karpenter-provider-cloudstack`
+- GitHub Release with CRDs
 
-## Crear un Release
+## Creating a Release
 
 ```bash
-# 1. Asegúrate de estar en main actualizado
+# 1. Ensure you're on updated main
 git checkout main
 git pull origin main
 
-# 2. Crea y push el tag
+# 2. Create and push the tag
 git tag -a v0.1.0 -m "Release v0.1.0"
 git push origin v0.1.0
 
-# 3. El workflow se ejecuta automáticamente
-# Monitorea en: https://github.com/mperea/karpenter-provider-cloudstack/actions
+# 3. The workflow runs automatically
+# Monitor at: https://github.com/mperea/karpenter-provider-cloudstack/actions
 ```
 
-## Variables de Entorno
+## Environment Variables
 
 ### CI Workflow
-- `go-version`: Versión de Go (1.25.4)
+- `go-version`: Go version (1.25.4)
 
 ### Release Workflow
 - `REGISTRY`: GitHub Container Registry (`ghcr.io`)
-- `IMAGE_NAME`: Nombre de la imagen (`cloudstack/karpenter/controller`)
-- `CHART_NAME`: Nombre del chart (`cloudstack/karpenter/karpenter`)
+- `IMAGE_NAME`: Image name (`cloudstack/karpenter/controller`)
+- `CHART_NAME`: Chart name (`cloudstack/karpenter/karpenter`)
 
-## Permisos Requeridos
+## Required Permissions
 
-Los workflows requieren los siguientes permisos en el token `GITHUB_TOKEN`:
+Workflows require the following permissions on the `GITHUB_TOKEN`:
 
-- `contents: write` - Para crear GitHub Releases
-- `packages: write` - Para publicar en GHCR
+- `contents: write` - To create GitHub Releases
+- `packages: write` - To publish to GHCR
 
-Estos permisos están configurados automáticamente en el workflow.
+These permissions are automatically configured in the workflow.
 
 ## Troubleshooting
 
 ### Error: "Resource not accessible by integration"
-**Causa:** Falta permiso `packages: write`  
-**Solución:** Verificar que el workflow tiene `permissions: packages: write`
+**Cause:** Missing `packages: write` permission
+**Solution:** Verify that the workflow has `permissions: packages: write`
 
-### Error: "Image not found" al instalar
-**Causa:** La imagen no se publicó correctamente  
-**Solución:** Verificar que el workflow `release` completó exitosamente
+### Error: "Image not found" when installing
+**Cause:** Image was not published correctly
+**Solution:** Verify that the `release` workflow completed successfully
 
 ### Error: "gh-pages branch not found"
-**Causa:** La rama `gh-pages` no existe  
-**Solución:** Crear manualmente la rama:
+**Cause:** The `gh-pages` branch doesn't exist
+**Solution:** Create the branch manually:
 ```bash
 git checkout --orphan gh-pages
 git rm -rf .
@@ -97,4 +97,4 @@ git commit -m "Initialize gh-pages"
 git push origin gh-pages
 ```
 
-Luego configurar en GitHub Settings → Pages → Source: `gh-pages` branch.
+Then configure in GitHub Settings → Pages → Source: `gh-pages` branch.

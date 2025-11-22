@@ -1,71 +1,71 @@
-# Versionado del Proyecto
+# Project Versioning
 
-Este proyecto sigue **[Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)** (Semver 2.0).
+This project follows **[Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)** (Semver 2.0).
 
 ---
 
-## 📐 Formato de Versión
+## Version Format
 
 ```
 vMAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
 ```
 
-### **Componentes Obligatorios**
+### Required Components
 
-#### **MAJOR** (v**X**.0.0)
-Incrementar cuando hay **cambios incompatibles** en la API:
-- Breaking changes en CloudStackNodeClass CRD
-- Eliminación de campos o funcionalidades
-- Cambios que requieren migración manual
-- Cambios en el comportamiento que rompen compatibilidad
+#### MAJOR (vX.0.0)
+Increment when making **incompatible API changes**:
+- Breaking changes in CloudStackNodeClass CRD
+- Removal of fields or functionality
+- Changes requiring manual migration
+- Changes in behavior that break compatibility
 
-**Ejemplos:**
-- Eliminar campo `spec.userData` de CloudStackNodeClass
-- Cambiar tipo de campo de `string` a `object`
-- Cambiar comportamiento por defecto de forma incompatible
+**Examples:**
+- Remove `spec.userData` field from CloudStackNodeClass
+- Change field type from `string` to `object`
+- Change default behavior in incompatible ways
 
-#### **MINOR** (v0.**X**.0)
-Incrementar cuando se añaden **nuevas funcionalidades** de forma compatible:
-- Nuevos campos opcionales en CloudStackNodeClass
-- Nuevas características que no rompen compatibilidad
-- Mejoras significativas de rendimiento
-- Nuevos providers o componentes
+#### MINOR (v0.X.0)
+Increment when adding **new backwards-compatible functionality**:
+- New optional fields in CloudStackNodeClass
+- New features that don't break compatibility
+- Significant performance improvements
+- New providers or components
 
-**Ejemplos:**
-- Añadir campo opcional `spec.diskOffering`
-- Añadir soporte para múltiples NICs
-- Implementar cache de Service Offerings
+**Examples:**
+- Add optional `spec.diskOffering` field
+- Add support for multiple NICs
+- Implement Service Offerings cache
 
-#### **PATCH** (v0.0.**X**)
-Incrementar para **bugfixes** y cambios menores compatibles:
-- Corrección de errores
-- Actualizaciones de seguridad
-- Mejoras de documentación
-- Actualizaciones de dependencias (sin breaking changes)
-- Optimizaciones de código sin cambio funcional
+#### PATCH (v0.0.X)
+Increment for **bug fixes** and minor backwards-compatible changes:
+- Error corrections
+- Security updates
+- Documentation improvements
+- Dependency updates (without breaking changes)
+- Code optimizations without functional changes
 
-**Ejemplos:**
-- Corregir memory leak en cache
-- Actualizar dependencia con fix de seguridad
-- Corregir validación de tags
+**Examples:**
+- Fix memory leak in cache
+- Update dependency with security fix
+- Fix tag validation
 
 ---
 
-### **Componentes Opcionales**
+### Optional Components
 
-#### **PRERELEASE** (v0.1.0-**alpha.1**)
-Identificadores de versiones no estables:
+#### PRERELEASE (v0.1.0-alpha.1)
+Identifiers for unstable versions:
 
-- **`alpha.N`**: Desarrollo temprano, puede tener bugs, API inestable
-- **`beta.N`**: Feature complete, fase de testing, API más estable
-- **`rc.N`**: Release candidate, candidato para release estable
+- **`alpha.N`**: Early development, may have bugs, unstable API
+- **`beta.N`**: Feature complete, testing phase, more stable API
+- **`rc.N`**: Release candidate, production-ready testing
 
-**Reglas:**
-- Los identificadores son alfanuméricos con guiones: `[0-9A-Za-z-]`
-- Se separan con puntos para múltiples identificadores
-- No hay ceros a la izquierda en identificadores numéricos
+**Rules:**
+- Identifiers are alphanumeric with hyphens: `[0-9A-Za-z-]`
+- Multiple identifiers separated by dots
+- No leading zeros in numeric identifiers
 
-**Ejemplos válidos:**
+**Valid examples:**
 ```
 v0.1.0-alpha.1
 v0.1.0-alpha.2
@@ -76,24 +76,24 @@ v1.0.0-alpha.20130313
 v1.0.0-0.3.7
 ```
 
-**Precedencia:**
+**Precedence:**
 ```
 v1.0.0-alpha < v1.0.0-alpha.1 < v1.0.0-beta < v1.0.0-beta.2 < v1.0.0-rc.1 < v1.0.0
 ```
 
-#### **BUILD** (v0.1.0+**20130313144700**)
-Metadatos de build (NO afecta precedencia de versión):
+#### BUILD (v0.1.0+20130313144700)
+Build metadata (does NOT affect version precedence):
 
-- Información de commit SHA
+- Commit SHA information
 - Timestamps
-- Identificadores de build
+- Build identifiers
 
-**Reglas:**
-- Se añade con `+`
-- Solo alfanumérico con guiones y puntos: `[0-9A-Za-z-.]+`
-- **No se usa para precedencia**: `v1.0.0+001 = v1.0.0+002`
+**Rules:**
+- Added with `+`
+- Only alphanumeric with hyphens and dots: `[0-9A-Za-z-.]+`
+- **Not used for precedence**: `v1.0.0+001 = v1.0.0+002`
 
-**Ejemplos válidos:**
+**Valid examples:**
 ```
 v1.0.0+20130313144700
 v1.0.0+exp.sha.5114f85
@@ -102,181 +102,180 @@ v1.0.0-beta.1+exp.sha.5114f85
 
 ---
 
-## 📊 Ejemplos Completos
+## Complete Examples
 
-### **Versiones Estables**
+### Stable Versions
 ```bash
-v0.1.0          # Primera versión estable (minor)
+v0.1.0          # First stable version (minor)
 v0.1.1          # Bugfix
-v0.2.0          # Nueva funcionalidad
-v1.0.0          # Primera versión production-ready
-v1.0.1          # Bugfix en v1
-v1.1.0          # Nueva funcionalidad en v1
+v0.2.0          # New functionality
+v1.0.0          # First production-ready version
+v1.0.1          # Bugfix in v1
+v1.1.0          # New functionality in v1
 v2.0.0          # Breaking change
 ```
 
-### **Pre-releases**
+### Pre-releases
 ```bash
-v0.1.0-alpha.1  # Alpha 1 de v0.1.0
-v0.1.0-alpha.2  # Alpha 2 de v0.1.0
-v0.1.0-beta.1   # Beta 1 de v0.1.0
-v0.1.0-beta.2   # Beta 2 de v0.1.0
+v0.1.0-alpha.1  # Alpha 1 of v0.1.0
+v0.1.0-alpha.2  # Alpha 2 of v0.1.0
+v0.1.0-beta.1   # Beta 1 of v0.1.0
+v0.1.0-beta.2   # Beta 2 of v0.1.0
 v0.1.0-rc.1     # Release candidate 1
 v0.1.0-rc.2     # Release candidate 2
-v0.1.0          # Release final
+v0.1.0          # Final release
 ```
 
-### **Con Build Metadata**
+### With Build Metadata
 ```bash
 v1.0.0+20130313144700
 v1.0.0-beta.1+exp.sha.5114f85
 v1.2.3-rc.1+build.123
 ```
 
-### **Versiones Inválidas** ❌
+### Invalid Versions
 ```bash
-1.0.0             # ❌ Falta prefijo 'v'
-v1.0              # ❌ Falta componente PATCH
-v1.0.0-Alpha.1    # ❌ 'A' mayúscula en prerelease
-v1.0.0.0          # ❌ Demasiados componentes
-v01.0.0           # ❌ Cero a la izquierda en MAJOR
-v1.01.0           # ❌ Cero a la izquierda en MINOR
-v1.0.01           # ❌ Cero a la izquierda en PATCH
+1.0.0             # Missing 'v' prefix
+v1.0              # Missing PATCH component
+v1.0.0-Alpha.1    # Uppercase 'A' in prerelease
+v1.0.0.0          # Too many components
+v01.0.0           # Leading zero in MAJOR
+v1.01.0           # Leading zero in MINOR
+v1.0.01           # Leading zero in PATCH
 ```
 
 ---
 
-## 🔄 Reglas de Precedencia (Orden)
+## Precedence Rules (Ordering)
 
-Semver 2.0.0 define un orden estricto de precedencia:
+Semver 2.0.0 defines strict precedence ordering:
 
 ```
 v1.0.0-alpha < v1.0.0-alpha.1 < v1.0.0-alpha.beta < v1.0.0-beta <
 v1.0.0-beta.2 < v1.0.0-beta.11 < v1.0.0-rc.1 < v1.0.0
 ```
 
-**Reglas:**
-1. MAJOR, MINOR, PATCH se comparan numéricamente
-2. Pre-release tiene menor precedencia que versión estable
-3. Identificadores de pre-release se comparan de izquierda a derecha:
-   - Numéricos se comparan como números: `1 < 2 < 10`
-   - Alfanuméricos se comparan lexicográficamente: `"alpha" < "beta"`
-   - Numérico < Alfanumérico: `1 < alpha`
-4. Build metadata NO afecta precedencia
+**Rules:**
+1. MAJOR, MINOR, PATCH compared numerically
+2. Pre-release has lower precedence than stable version
+3. Pre-release identifiers compared left-to-right:
+   - Numeric compared as numbers: `1 < 2 < 10`
+   - Alphanumeric compared lexicographically: `"alpha" < "beta"`
+   - Numeric < Alphanumeric: `1 < alpha`
+4. Build metadata does NOT affect precedence
 
-**Ejemplo:**
+**Example:**
 ```
 v1.0.0-alpha.1 < v1.0.0-alpha.2 < v1.0.0-beta.1 < v1.0.0
 ```
 
 ---
 
-## 🚀 Proceso de Release
+## Release Process
 
-### **1. Versión Alpha (Testing Inicial)**
+### 1. Alpha Version (Initial Testing)
 ```bash
 git tag -a v0.1.0-alpha.1 -m "Alpha 1: Initial testing"
 git push origin v0.1.0-alpha.1
 ```
-**Uso:** Testing interno, desarrollo activo, API puede cambiar
+**Usage:** Internal testing, active development, API may change
 
-### **2. Versión Beta (Feature Complete)**
+### 2. Beta Version (Feature Complete)
 ```bash
 git tag -a v0.1.0-beta.1 -m "Beta 1: Feature complete"
 git push origin v0.1.0-beta.1
 ```
-**Uso:** Testing en staging, API estabilizada
+**Usage:** Staging testing, API stabilized
 
-### **3. Release Candidate (Candidato a Producción)**
+### 3. Release Candidate (Production Candidate)
 ```bash
 git tag -a v0.1.0-rc.1 -m "Release Candidate 1"
 git push origin v0.1.0-rc.1
 ```
-**Uso:** Testing final antes de producción
+**Usage:** Final testing before production
 
-### **4. Release Estable (Producción)**
+### 4. Stable Release (Production)
 ```bash
 git tag -a v0.1.0 -m "Release v0.1.0"
 git push origin v0.1.0
 ```
-**Uso:** Producción, tag `latest` se actualiza
+**Usage:** Production, `latest` tag updated
 
 ---
 
-## 🔖 Guía de Decisión
+## Decision Guide
 
-### **¿Cuándo incrementar cada componente?**
+### When to increment each component?
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ ¿Rompe compatibilidad con versión anterior?             │
-│ (Breaking changes)                                       │
+│ Does it break compatibility with previous version?     │
+│ (Breaking changes)                                      │
 └────────────────┬────────────────────────────────────────┘
                  │
          ┌───────┴───────┐
-         │ SÍ            │ NO
+         │ YES           │ NO
          │               │
          ▼               ▼
     MAJOR++      ┌──────────────────────────────────────┐
-                 │ ¿Añade nueva funcionalidad?          │
+                 │ Does it add new functionality?       │
                  │ (New features)                       │
                  └────────────┬─────────────────────────┘
                               │
                       ┌───────┴───────┐
-                      │ SÍ            │ NO
+                      │ YES           │ NO
                       │               │
                       ▼               ▼
                   MINOR++        PATCH++
 ```
 
-### **Ejemplos de Cambios**
+### Change Examples
 
-| Cambio | Tipo | Nueva Versión |
+| Change | Type | New Version |
 |--------|------|---------------|
-| Añadir campo opcional en CRD | MINOR | v0.1.0 → v0.2.0 |
-| Eliminar campo de CRD | MAJOR | v0.2.0 → v1.0.0 |
-| Corregir bug | PATCH | v0.2.0 → v0.2.1 |
-| Actualizar docs | PATCH | v0.2.1 → v0.2.2 |
-| Añadir nueva feature | MINOR | v0.2.2 → v0.3.0 |
-| Cambiar API incompatible | MAJOR | v0.3.0 → v1.0.0 |
+| Add optional field in CRD | MINOR | v0.1.0 → v0.2.0 |
+| Remove CRD field | MAJOR | v0.2.0 → v1.0.0 |
+| Fix bug | PATCH | v0.2.0 → v0.2.1 |
+| Update docs | PATCH | v0.2.1 → v0.2.2 |
+| Add new feature | MINOR | v0.2.2 → v0.3.0 |
+| Incompatible API change | MAJOR | v0.3.0 → v1.0.0 |
 
 ---
 
-## ✅ Validación de Versiones
+## Version Validation
 
-El workflow de CI valida automáticamente que los tags sigan Semver 2.0.0:
+The CI workflow automatically validates that tags follow Semver 2.0.0:
 
-**Regex de validación:**
+**Validation regex:**
 ```regex
 ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$
 ```
 
-Si el tag no es válido, el build fallará con un error descriptivo.
+If the tag is invalid, the build will fail with a descriptive error.
 
 ---
 
-## 📚 Referencias
+## References
 
 - **Semantic Versioning 2.0.0**: https://semver.org/spec/v2.0.0.html
 - **Semver Calculator**: https://semver.npmjs.com/
-- **Regex101 (testar regex)**: https://regex101.com/
+- **Regex101 (test regex)**: https://regex101.com/
 
 ---
 
-## 🎯 Recomendaciones
+## Recommendations
 
-### **Pre-1.0.0 (Desarrollo Inicial)**
-- MINOR puede tener breaking changes
-- Usar v0.x.x hasta que la API sea estable
-- Primera versión estable: v1.0.0
+### Pre-1.0.0 (Initial Development)
+- MINOR may have breaking changes
+- Use v0.x.x until API is stable
+- First stable version: v1.0.0
 
-### **Post-1.0.0 (Producción)**
-- MAJOR solo para breaking changes
-- MINOR para nuevas features compatibles
-- PATCH para bugfixes
+### Post-1.0.0 (Production)
+- MAJOR only for breaking changes
+- MINOR for compatible new features
+- PATCH for bugfixes
 
-### **Pre-releases**
-- Siempre testear en staging antes de release estable
-- Usar alpha → beta → rc → stable
-- No saltar directamente a stable desde alpha
-
+### Pre-releases
+- Always test in staging before stable release
+- Use alpha → beta → rc → stable
+- Don't skip directly to stable from alpha

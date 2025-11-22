@@ -1,8 +1,8 @@
-# Arquitectura del Proyecto
+# Project Architecture
 
-## 📐 Visión General
+## Overview
 
-Karpenter Provider for CloudStack sigue la arquitectura extensible de Karpenter, implementando los interfaces específicos para CloudStack.
+Karpenter Provider for CloudStack follows the extensible Karpenter architecture, implementing CloudStack-specific interfaces.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -30,12 +30,12 @@ Karpenter Provider for CloudStack sigue la arquitectura extensible de Karpenter,
 
 ---
 
-## 🏗️ Componentes Principales
+## Main Components
 
-### **1. Custom Resource Definitions (CRDs)**
+### 1. Custom Resource Definitions (CRDs)
 
-#### **CloudStackNodeClass**
-Define la configuración específica de CloudStack para los nodos:
+#### CloudStackNodeClass
+Defines CloudStack-specific node configuration:
 
 ```yaml
 apiVersion: karpenter.k8s.cloudstack/v1
@@ -56,18 +56,18 @@ spec:
     # Bootstrap script
 ```
 
-**Campos principales:**
-- `zone`: Zona de CloudStack donde se crearán las VMs
-- `networkSelectorTerms`: Selección de red(es)
-- `serviceOfferingSelectorTerms`: Selección de Service Offerings
-- `templateSelectorTerms`: Selección de templates/imágenes
-- `userData`: Script de inicialización
-- `tags`: Tags a aplicar a las VMs
+**Main fields:**
+- `zone`: CloudStack zone where VMs will be created
+- `networkSelectorTerms`: Network selection
+- `serviceOfferingSelectorTerms`: Service Offering selection
+- `templateSelectorTerms`: Template/image selection
+- `userData`: Initialization script
+- `tags`: Tags to apply to VMs
 
-### **2. Providers**
+### 2. Providers
 
-#### **Instance Provider** (`pkg/providers/instance/`)
-Gestiona el ciclo de vida de las VMs en CloudStack:
+#### Instance Provider (`pkg/providers/instance/`)
+Manages VM lifecycle in CloudStack:
 
 ```go
 type Provider interface {
@@ -78,14 +78,14 @@ type Provider interface {
 }
 ```
 
-**Responsabilidades:**
-- Crear VMs usando `deployVirtualMachine`
-- Consultar estado de VMs
-- Eliminar VMs usando `destroyVirtualMachine`
-- Mapear VMs de CloudStack a Instances de Karpenter
+**Responsibilities:**
+- Create VMs using `deployVirtualMachine`
+- Query VM status
+- Delete VMs using `destroyVirtualMachine`
+- Map CloudStack VMs to Karpenter Instances
 
-#### **InstanceType Provider** (`pkg/providers/instancetype/`)
-Descubre y cachea Service Offerings de CloudStack:
+#### InstanceType Provider (`pkg/providers/instancetype/`)
+Discovers and caches CloudStack Service Offerings:
 
 ```go
 type Provider interface {
@@ -94,14 +94,14 @@ type Provider interface {
 }
 ```
 
-**Responsabilidades:**
-- Listar Service Offerings usando `listServiceOfferings`
-- Convertir Service Offerings a InstanceTypes de Karpenter
-- Cachear resultados para mejorar rendimiento
-- Filtrar por tags y requisitos
+**Responsibilities:**
+- List Service Offerings using `listServiceOfferings`
+- Convert Service Offerings to Karpenter InstanceTypes
+- Cache results for performance
+- Filter by tags and requirements
 
-#### **Network Provider** (`pkg/providers/network/`)
-Gestiona la selección de redes:
+#### Network Provider (`pkg/providers/network/`)
+Manages network selection:
 
 ```go
 type Provider interface {
@@ -111,13 +111,13 @@ type Provider interface {
 }
 ```
 
-**Responsabilidades:**
-- Buscar redes por nombre, ID o tags
-- Validar disponibilidad de redes
-- Cachear información de redes
+**Responsibilities:**
+- Search networks by name, ID, or tags
+- Validate network availability
+- Cache network information
 
-#### **Template Provider** (`pkg/providers/template/`)
-Gestiona la selección de templates/imágenes:
+#### Template Provider (`pkg/providers/template/`)
+Manages template/image selection:
 
 ```go
 type Provider interface {
@@ -127,13 +127,13 @@ type Provider interface {
 }
 ```
 
-**Responsabilidades:**
-- Buscar templates por nombre, ID o tags
-- Validar templates disponibles
-- Cachear información de templates
+**Responsibilities:**
+- Search templates by name, ID, or tags
+- Validate available templates
+- Cache template information
 
-#### **Zone Provider** (`pkg/providers/zone/`)
-Gestiona información de zonas de CloudStack:
+#### Zone Provider (`pkg/providers/zone/`)
+Manages CloudStack zone information:
 
 ```go
 type Provider interface {
@@ -142,24 +142,24 @@ type Provider interface {
 }
 ```
 
-**Responsabilidades:**
-- Listar zonas disponibles
-- Validar zonas
-- Cachear información de zonas
+**Responsibilities:**
+- List available zones
+- Validate zones
+- Cache zone information
 
-### **3. Controllers**
+### 3. Controllers
 
-#### **NodeClass Controller** (`pkg/controllers/nodeclass/`)
-Reconcilia CloudStackNodeClass recursos:
+#### NodeClass Controller (`pkg/controllers/nodeclass/`)
+Reconciles CloudStackNodeClass resources:
 
-**Responsabilidades:**
-- Validar configuración de CloudStackNodeClass
-- Verificar que zone, networks, templates existan
-- Actualizar status conditions (Ready, NetworkReady, etc.)
-- Detectar cambios de configuración (drift)
+**Responsibilities:**
+- Validate CloudStackNodeClass configuration
+- Verify that zone, networks, templates exist
+- Update status conditions (Ready, NetworkReady, etc.)
+- Detect configuration changes (drift)
 
-### **4. Cloud Provider** (`pkg/cloudprovider/`)
-Implementa la interfaz principal de Karpenter:
+### 4. Cloud Provider (`pkg/cloudprovider/`)
+Implements the main Karpenter interface:
 
 ```go
 type CloudProvider interface {
@@ -172,64 +172,64 @@ type CloudProvider interface {
 }
 ```
 
-**Responsabilidades:**
-- Orquestar los diferentes providers
-- Implementar la lógica de creación/eliminación de nodos
-- Gestionar el mapeo entre Karpenter y CloudStack
-- Generar ProviderID único para cada nodo
+**Responsibilities:**
+- Orchestrate different providers
+- Implement node creation/deletion logic
+- Manage mapping between Karpenter and CloudStack
+- Generate unique ProviderID for each node
 
 ---
 
-## 🔄 Flujo de Provisión de Nodo
+## Node Provisioning Flow
 
 ```
-1. Pod sin schedulear
+1. Unscheduled Pod
    │
    ▼
-2. Karpenter Core detecta necesidad
+2. Karpenter Core detects need
    │
    ▼
-3. Calcula requisitos (CPU, RAM, labels, taints)
+3. Calculate requirements (CPU, RAM, labels, taints)
    │
    ▼
 4. CloudProvider.GetInstanceTypes()
    │
-   ├─► InstanceType Provider lista Service Offerings
-   │   └─► Filtra por requisitos
+   ├─► InstanceType Provider lists Service Offerings
+   │   └─► Filter by requirements
    │
    ▼
-5. Selecciona InstanceType óptimo
+5. Select optimal InstanceType
    │
    ▼
 6. CloudProvider.Create(NodeClaim)
    │
-   ├─► Template Provider busca imagen
-   ├─► Network Provider busca red
-   └─► Instance Provider crea VM
+   ├─► Template Provider searches for image
+   ├─► Network Provider searches for network
+   └─► Instance Provider creates VM
        │
        └─► cloudstack.deployVirtualMachine()
    │
    ▼
-7. VM creada en CloudStack
+7. VM created in CloudStack
    │
    ▼
-8. Node se registra en Kubernetes
+8. Node registers in Kubernetes
    │
    ▼
-9. Pod se schedule en el nuevo nodo
+9. Pod scheduled on new node
 ```
 
 ---
 
-## 🗂️ Estructura de Directorios
+## Directory Structure
 
 ```
 karpenter-provider-cloudstack/
 ├── cmd/
 │   └── controller/
-│       └── main.go                      # Entrypoint del controller
+│       └── main.go                      # Controller entrypoint
 ├── pkg/
-│   ├── apis/                            # CRDs y API definitions
+│   ├── apis/                            # CRDs and API definitions
 │   │   └── v1/
 │   │       ├── cloudstacknodeclass.go   # CloudStackNodeClass CRD
 │   │       ├── doc.go                   # API group registration
@@ -268,7 +268,8 @@ karpenter-provider-cloudstack/
 │       └── templates/                   # Kubernetes manifests
 ├── docs/                                # Documentation
 │   ├── ARCHITECTURE.md                  # This file
-│   └── RELEASE.md                       # Release process
+│   ├── RELEASE.md                       # Release process
+│   └── VERSIONING.md                    # Versioning guide
 ├── .github/
 │   └── workflows/                       # CI/CD workflows
 │       ├── ci.yaml                      # Continuous integration
@@ -283,29 +284,29 @@ karpenter-provider-cloudstack/
 
 ---
 
-## 🔌 Integración con Karpenter Core
+## Integration with Karpenter Core
 
-### **Dependencias**
+### Dependencies
 ```
 sigs.k8s.io/karpenter               # Karpenter Core APIs
 github.com/awslabs/operatorpkg      # Operator utilities
 github.com/apache/cloudstack-go/v2  # CloudStack SDK
 ```
 
-### **Puntos de Extensión**
-Karpenter Core proporciona interfaces que este provider implementa:
+### Extension Points
+Karpenter Core provides interfaces that this provider implements:
 
-1. **cloudprovider.CloudProvider**: Interface principal
-2. **v1.NodeClaim**: Abstracción de nodo cloud-agnostic
-3. **v1.NodePool**: Definición de pool de nodos
-4. **cloudprovider.InstanceType**: Tipo de instancia cloud-agnostic
+1. **cloudprovider.CloudProvider**: Main interface
+2. **v1.NodeClaim**: Cloud-agnostic node abstraction
+3. **v1.NodePool**: Node pool definition
+4. **cloudprovider.InstanceType**: Cloud-agnostic instance type
 
 ---
 
-## 🛡️ Seguridad
+## Security
 
-### **Secrets Management**
-Las credenciales de CloudStack se gestionan mediante Kubernetes Secrets:
+### Secrets Management
+CloudStack credentials are managed through Kubernetes Secrets:
 
 ```yaml
 apiVersion: v1
@@ -320,54 +321,53 @@ stringData:
   secret-key: your-secret-key
 ```
 
-### **RBAC**
-El controller requiere permisos mínimos:
-- Leer/escribir CloudStackNodeClass
-- Leer NodeClaims y NodePools
-- Leer Secrets (solo cloudstack-credentials)
+### RBAC
+The controller requires minimal permissions:
+- Read/write CloudStackNodeClass
+- Read NodeClaims and NodePools
+- Read Secrets (only cloudstack-credentials)
 
-### **Network Security**
-- Todas las comunicaciones con CloudStack API usan HTTPS
-- Soporta verificación de certificados TLS
-- Opcional: Proxy support para entornos corporativos
+### Network Security
+- All communication with CloudStack API uses HTTPS
+- Supports TLS certificate verification
+- Optional: Proxy support for corporate environments
 
 ---
 
-## 📊 Observabilidad
+## Observability
 
-### **Métricas** (Futuro)
-- Número de VMs creadas/eliminadas
-- Tiempo de provisión de VMs
-- Errores de API de CloudStack
+### Metrics (Future)
+- Number of VMs created/deleted
+- VM provisioning time
+- CloudStack API errors
 - Cache hits/misses
 
-### **Logging**
-- Nivel de log configurable (debug, info, warn, error)
-- Logs estructurados en JSON
-- Contexto de request tracing
+### Logging
+- Configurable log level (debug, info, warn, error)
+- Structured JSON logs
+- Request tracing context
 
-### **Health Checks**
-- Liveness probe: Controller está corriendo
-- Readiness probe: Puede comunicar con CloudStack API
+### Health Checks
+- Liveness probe: Controller is running
+- Readiness probe: Can communicate with CloudStack API
 
 ---
 
-## 🔮 Roadmap Futuro
+## Future Roadmap
 
-### **Features Planeadas**
-1. **Affinity/Anti-affinity**: Soporte para anti-affinity entre VMs
-2. **Spot instances**: Soporte para CloudStack preemptible instances
-3. **GPU support**: Provisión de VMs con GPUs
-4. **Custom networking**: Soporte para múltiples NICs
-5. **Storage options**: Volúmenes adicionales
+### Planned Features
+1. **Affinity/Anti-affinity**: Support for VM anti-affinity
+2. **Spot instances**: Support for CloudStack preemptible instances
+3. **GPU support**: Provision VMs with GPUs
+4. **Custom networking**: Support for multiple NICs
+5. **Storage options**: Additional volumes
 6. **Metrics exporter**: Prometheus metrics
-7. **Drift detection**: Detectar cambios manuales en VMs
-8. **Cost optimization**: Estrategias de ahorro de costos
+7. **Drift detection**: Detect manual changes in VMs
+8. **Cost optimization**: Cost-saving strategies
 
-### **Mejoras Técnicas**
-1. **Tests de integración**: Suite completa con CloudStack simulator
-2. **E2E tests**: Tests end-to-end en cluster real
-3. **Performance profiling**: Optimización de rendimiento
-4. **Cache layer**: Mejora de caching con TTL configurable
-5. **Webhooks**: Validating/Mutating webhooks para CRDs
-
+### Technical Improvements
+1. **Integration tests**: Complete suite with CloudStack simulator
+2. **E2E tests**: End-to-end tests on real cluster
+3. **Performance profiling**: Performance optimization
+4. **Cache layer**: Improved caching with configurable TTL
+5. **Webhooks**: Validating/Mutating webhooks for CRDs
