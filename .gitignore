@@ -38,6 +38,6 @@ charts/*/charts/
 tmp/
 .tmp/
 
-# Generated files
-zz_generated.*
+# Generated files (deepcopy files should be committed)
+# zz_generated.* - These are now committed to ensure CI works properly
 
