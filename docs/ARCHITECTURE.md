@@ -5,27 +5,27 @@
 Karpenter Provider for CloudStack follows the extensible Karpenter architecture, implementing CloudStack-specific interfaces.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Karpenter Core                            │
-│  (Scheduling, Provisioning, Deprovisioning logic)           │
-└───────────────────────┬─────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│                    Karpenter Core                      │
+│    (Scheduling, Provisioning, Deprovisioning logic)    │
+└───────────────────────┬────────────────────────────────┘
                         │ Cloud Provider Interface
-┌───────────────────────▼─────────────────────────────────────┐
-│              Karpenter CloudStack Provider                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  Instance    │  │ InstanceType │  │   Network    │      │
-│  │  Provider    │  │  Provider    │  │   Provider   │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  Template    │  │    Zone      │  │ NodeClass    │      │
-│  │  Provider    │  │  Provider    │  │ Controller   │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-└───────────────────────┬─────────────────────────────────────┘
+┌───────────────────────▼────────────────────────────────┐
+│              Karpenter CloudStack Provider             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  Instance    │  │ InstanceType │  │   Network    │  │
+│  │  Provider    │  │  Provider    │  │   Provider   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  Template    │  │    Zone      │  │ NodeClass    │  │
+│  │  Provider    │  │  Provider    │  │ Controller   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└───────────────────────┬────────────────────────────────┘
                         │ CloudStack SDK
-┌───────────────────────▼─────────────────────────────────────┐
-│                  CloudStack API                              │
-│  (deployVirtualMachine, listServiceOfferings, etc.)         │
-└─────────────────────────────────────────────────────────────┘
+┌───────────────────────▼────────────────────────────────┐
+│                  CloudStack API                        │
+│   (deployVirtualMachine, listServiceOfferings, etc.)   │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
